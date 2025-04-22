@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import Error
 
@@ -13,19 +12,7 @@ def create_connection(host, port, user, password, database):
             database= database
         )
 
-        if connection.is_connected():
-            with connection.cursor() as cursor:
-                cursor.execute("show tables")
-                for tabla in cursor.fetchall():
-                    print(tabla)
-
-                cursor.execute("select * from status_history")
-                print(cursor.fetchall()[0])
-
-                cursor.execute("SELECT * from status ")
-                print(cursor.fetchall())
-                
-                
+        if connection.is_connected():                
             return connection
         
     except Error as e:

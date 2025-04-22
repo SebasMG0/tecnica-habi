@@ -13,8 +13,9 @@ if __name__ == "__main__":
     PASS= os.getenv("PASS")
     SCHEMA= os.getenv("SCHEMA")
 
-    with connector.create_connection(host= HOST, port=PORT, user=USER, 
-                                     password=PASS, database=SCHEMA) as connector:
+    print(HOST, PORT, USER, PASS, SCHEMA)
+
+    with connector.create_connection(host= HOST, port=PORT, user=USER, password=PASS, database=SCHEMA) as connector:
         if connector:
             print("Conexión establecida correctamente.")
         else:
