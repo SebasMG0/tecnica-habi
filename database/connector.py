@@ -24,6 +24,7 @@ def execute_query(connection, query, params=None):
         with connection.cursor() as cursor:
             cursor.execute(query, params)
             return cursor.fetchall()
+    return None
 
 
 if __name__ == "__main__":

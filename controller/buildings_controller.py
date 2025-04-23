@@ -1,3 +1,6 @@
+import os
+import database.connector as connector
+
 def get_buildings_query(filters:dict, status_filter_codes:dict) -> str:
     base_query = ("SELECT sh.*, s.*, p.*"
                     "FROM status_history sh "
@@ -7,7 +10,7 @@ def get_buildings_query(filters:dict, status_filter_codes:dict) -> str:
                         "GROUP BY property_id) latest "
                     "ON sh.property_id = latest.property_id AND sh.update_date = latest.last_update "
                     "INNER JOIN status s ON sh.status_id = s.id "
-                    "INNER JOIN property p ON sh.property_id = p.id) ")
+                    "INNER JOIN property p ON sh.property_id = p.id ")
                 
     where_clauses = []
     
@@ -31,21 +34,35 @@ def get_buildings_query(filters:dict, status_filter_codes:dict) -> str:
                 raise ValueError("Invalid status filter")
             
             elif len(filters["status"]) == 1:
-                where_clauses.append(f"status = {filters['status'][0]}")
+                where_clauses.append(f"status_id = {filters['status'][0]}")
 
             else:
-                where_clauses.append(f"status IN ({', '.join(map(str, filters['status']))})")
+                where_clauses.append(f"status_id IN ({', '.join(map(str, filters['status']))})")
         
         if "city" in filters.keys():
             if len(filters["city"]) == 1:
                 where_clauses.append(f"city = '{filters['city'][0]}'")
 
             elif len(filters["city"]) >= 2:
-                where_clauses.append(f"city IN ({', '.join(map(str, filters['city']))})")
+                where_clauses.append(f"city IN ({', '.join(map(lambda city: f"'{str(city)}'", filters['city']))})")
         
             else:
                 raise ValueError("Invalid city filter")
         
         base_query += " WHERE " + " AND ".join(where_clauses)
+        print(base_query)
     
     return base_query
+
+def execute_query(status_filter_codes:dict, filters:dict):
+    query= get_buildings_query(filters= filters, status_filter_codes= status_filter_codes)
+
+    with connector.create_connection(host = os.getenv("HOST"), 
+                                     port = os.getenv("PORT"),
+                                     user = os.getenv("USER"),
+                                     password = os.getenv("PASS"),
+                                     database = os.getenv("SCHEMA")) as connection:
+        if connection:
+            return connector.execute_query(connection= connection, query= query)
+        else:
+            raise Exception("There was an error connecting to the database")

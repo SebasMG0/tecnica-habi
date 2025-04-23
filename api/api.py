@@ -2,7 +2,7 @@
 import json
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from controller.buildings_controller import get_buildings_query
+from controller.buildings_controller import execute_query
 
 STATUS_FILTER_CODES = {
     "pre_venta": 3,
@@ -37,15 +37,13 @@ class SimpleRESTHandler(BaseHTTPRequestHandler):
             filters = {} # YEAR, STATUS, CITY
 
         try:
-            query = get_buildings_query(filters= filters, status_filter_codes= STATUS_FILTER_CODES)
+            query = execute_query(status_filter_codes= STATUS_FILTER_CODES, filters= filters)
             print(query)
 
         except ValueError as e:
             self.send_error(400, str(e))
             print(str(e))
             return
-
-
             
         response = [
             {"id": "1", "name": "Recurso 1"},
