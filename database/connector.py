@@ -18,17 +18,12 @@ def create_connection(host, port, user, password, database):
     except Error as e:
         return None
 
-def execute_query(query, params=None):
-    try:
-        with create_connection() as connection:
-            if connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(query, params)
-                    resultados = cursor.fetchall()
-                    return resultados
-    except Error as e:
-        print(f"Error al ejecutar la consulta: {e}")
-        return None
+
+def execute_query(connection, query, params=None):
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+            return cursor.fetchall()
 
 
 if __name__ == "__main__":
