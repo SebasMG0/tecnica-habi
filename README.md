@@ -95,6 +95,21 @@ También es posible no enviar ninguna información en el cuerpo de la petición.
 
 ## Requerimiento 2: *Me Gusta*
 
-![Tecnica HABI REQ2](https://github.com/user-attachments/assets/42f5e00a-848d-488a-8a56-85c0b9f35486)
-
 Para añadir soporte para implementar me gusta a los usuarios registrados se añade la tabla *like_history*, en la cual se guardan los campos que referencian los ids de las propiedades a las cuales los usuarios identificados con un id les dan like. De este modo es posible guardar el historial de likes de un usuario que se halla registrado sin degradar la normalización de la base de datos y utilizando la tabla *auth_user* que ya se encuentra creada. Además, el campo *update_date* ayuda a llevar una traza del comportamiento de un usuario con sus respectivos gustos por determinados inmuebles.
+
+El código para la creación de la tabla *like_history* y las restricciones de llave foránea necesarias para extender el modelo se muestra a continuación:
+
+```sql
+
+CREATE TABLE like_history(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    property_id INT NOT NULL,
+    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE like_history
+ADD CONSTRAINT fk_property FOREIGN KEY (property_id) REFERENCES property(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES auth_user(id) ON DELETE CASCADE;
+
+```
