@@ -1,4 +1,5 @@
 # Prueba Técnica Habi
+Sebastián Murcia Gómez - s.murciag@uniandes.edu.co
 
 ## Tecnologías a utilizar
 El desarrollo se llevará a cabo utilizando python. Dadas las condiciones de implementación se evita el uso de frameworks como flask o fastapi, por lo que se utilizará librerías de python para el manejo de variables de entorno, conectores para la base de datos y soporte para el desarrollo de consultas http. En particular, se utilizan las librerías:
@@ -33,6 +34,8 @@ De este modo, la estructura de carpetas propuesta para el cumplimiento de los re
 └── main.py
 ```
 
+El proceso de desarrollo inició con la creacioń del conector para la base de datos, osteriormente se definió el endpoint y el tipo la estructura de datos de la información recibida del frontend  para dar cumplimiento a los requisitos del primer requerimiento. Por último se realizó el controlador destinado a servir de puente entre la api y la base de datos para continuar con las pruebas unitarias de los principales componentes de la aplicación.
+
 ### Aspectos a Tomar en Cuenta
 
 #### Filtros
@@ -58,3 +61,34 @@ Para ejecutar la aplicación se hace necesario cumplir con los siguientes requer
 - Creación de un archivo *.env* en la raiz del proyecto con las variables que se mencionaron en el apartado *Estructura de Carpetas*
 
 - Ejecución del archivo *main.py*
+
+### Pruebas Unitarias
+Para ejecutar las pruebas unitarias y explorar su cobertura total se ejecuta el comando:
+
+```bash
+pytest --cov
+```
+
+### Información del Frontend
+Se espera que el frontend envíe en formato .json los campos por los cuales se van a filtrar los resultados. Algunos ejemplos válidos se muestran a continuación:
+
+```json
+{
+    "status": [3, 4],
+    "year": [2010, 2024],
+    "city": ["bogota", "medellin", "cali"]
+}
+```
+```json
+{
+    "status": [3, 4]
+}
+```
+
+```json
+{
+    "year": [2015]
+}
+```
+
+También es posible no enviar ninguna información en el cuerpo de la petición.
