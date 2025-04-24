@@ -1,8 +1,17 @@
 import os
+
 import database.connector as connector
 
-def get_buildings_query(filters:dict, status_filter_codes:dict) -> str:
-    base_query = ("SELECT sh.*, s.*, p.*"
+def get_buildings_query(filters:dict[str, list], status_filter_codes:dict[str, int]) -> str:
+    """
+        Generate a SQL query to retrieve building information based on the provided filters.
+
+        Args:
+            filters: A dictionary containing the filters to apply to the query.
+            status_filter_codes: A dictionary mapping status codes to their names.
+    """
+
+    base_query = ("SELECT s.name, p.city, p.address, p.year, p.price, p.description "
                     "FROM status_history sh "
                     "INNER JOIN ( "
                         "SELECT property_id, MAX(update_date) AS last_update "
@@ -44,17 +53,30 @@ def get_buildings_query(filters:dict, status_filter_codes:dict) -> str:
                 where_clauses.append(f"city = '{filters['city'][0]}'")
 
             elif len(filters["city"]) >= 2:
-                where_clauses.append(f"city IN ({', '.join(map(lambda city: f"'{str(city)}'", filters['city']))})")
+                where_clauses.append(f"city IN ({', '.join( map(lambda city: f"'{str(city)}'", filters['city']) )})")
         
             else:
                 raise ValueError("Invalid city filter")
         
         base_query += " WHERE " + " AND ".join(where_clauses)
-        print(base_query)
     
     return base_query
 
-def execute_query(status_filter_codes:dict, filters:dict):
+
+def execute_query(status_filter_codes:dict[str, int], filters:dict[str, list], columns:list[str])-> dict:
+    """
+        Execute a query to the database and return the results.
+
+        Args:
+            status_filter_codes: A dictionary mapping status codes to their names.
+            filters: A dictionary containing the filters to apply to the query.
+            columns: A list of column names to include in the results.
+
+        Returns:
+            formatted_results: A list of dictionaries representing the query results, 
+            where each dictionary corresponds to a row in the result set.
+    """
+    
     query= get_buildings_query(filters= filters, status_filter_codes= status_filter_codes)
 
     with connector.create_connection(host = os.getenv("HOST"), 
@@ -63,6 +85,11 @@ def execute_query(status_filter_codes:dict, filters:dict):
                                      password = os.getenv("PASS"),
                                      database = os.getenv("SCHEMA")) as connection:
         if connection:
-            return connector.execute_query(connection= connection, query= query)
+            results = connector.execute_query(connection= connection, query= query)
+            formatted_results = [
+                dict(zip(columns, row)) for row in results
+            ]
+            return formatted_results
+        
         else:
             raise Exception("There was an error connecting to the database")

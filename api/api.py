@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
-
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from controller.buildings_controller import execute_query
 
 STATUS_FILTER_CODES = {
@@ -10,17 +10,29 @@ STATUS_FILTER_CODES = {
     "vendido": 5
 }
 
-# Función auxiliar para establecer cabeceras
+QUERY_COLUMNS= ["status", "city", "address", "year", "price", "description"]
+
 def set_response(handler, code=200):
+    """
+        Set the response code and headers for the HTTP response.
+
+        Args:
+            handler: The HTTP request handler.
+            code: The HTTP response code to set. Default is 200 (OK).
+
+        Returns:
+            None
+    """
     handler.send_response(code)
     handler.send_header('Content-Type', 'application/json')
-
-    # handler.send_header('Access-Control-Allow-Origin', '*')
     handler.end_headers()
 
-class SimpleRESTHandler(BaseHTTPRequestHandler):
-    
+
+class BuildingsRESTHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        """
+            Handle GET requests to the server.
+        """
         if not self.path.startswith("/api/buildings"):
             self.send_error(404, "Endpoint is not found")
         
@@ -34,27 +46,31 @@ class SimpleRESTHandler(BaseHTTPRequestHandler):
                 self.send_error(400, "The JSON body is not valid")
                 return
         else:
-            filters = {} # YEAR, STATUS, CITY
+            filters = {}
 
         try:
-            query = execute_query(status_filter_codes= STATUS_FILTER_CODES, filters= filters)
-            print(query)
+            results = execute_query(status_filter_codes= STATUS_FILTER_CODES, filters= filters, columns= QUERY_COLUMNS)
+            
 
         except ValueError as e:
             self.send_error(400, str(e))
-            print(str(e))
             return
-            
-        response = [
-            {"id": "1", "name": "Recurso 1"},
-            {"id": "2", "name": "Recurso 2"}
-        ]
+        
         set_response(self)
-        self.wfile.write(json.dumps(response).encode())
-            
+        self.wfile.write(json.dumps(results).encode())         
 
-def run(server_class=HTTPServer, handler_class=SimpleRESTHandler, 
-        port=3000, server_address='127.0.0.1'):
+def run(server_class = HTTPServer, handler_class = BuildingsRESTHandler, 
+        port=3000, server_address='127.0.0.1') -> None:
+    """
+        Run the HTTP server.
+
+        Args:
+            server_class: The class of the server to run.
+            handler_class: The class of the request handler to use.
+            port: The port to listen on.
+            server_address: The address to bind the server to. 
+    """
+
     httpd = server_class((server_address, port), handler_class)
     print(f"Iniciando servidor en el puerto {port}...")
     
@@ -63,9 +79,7 @@ def run(server_class=HTTPServer, handler_class=SimpleRESTHandler,
 
     except KeyboardInterrupt:
         print("Deteniendo el servidor...")
-        pass
-
-    httpd.server_close()
-
-if __name__ == "__main__":
-    run()
+    
+    finally:
+        httpd.server_close()
+        print("Servidor detenido.")

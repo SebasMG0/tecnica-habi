@@ -7,10 +7,11 @@ if __name__ == "__main__":
     # Load variables from .env file
     load_dotenv(override=True)
 
-    api.run()
-
-
-    # with connector.create_connection(host= HOST, port=PORT, user=USER, password=PASS, database=SCHEMA) as connector:
+    try:
+        api.run()
+    except Exception as e:
+        print(f"Error: {e}")
+        exit(1)
         
     
     

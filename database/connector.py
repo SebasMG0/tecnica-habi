@@ -3,6 +3,19 @@ import mysql.connector
 from mysql.connector import Error
 
 def create_connection(host, port, user, password, database):
+    """
+        Create a database connection to the MySQL database server.
+        
+        Args:
+            host: The hostname of the database server.
+            port: The port number of the database server
+            user: The username to connect to the database.
+            password: The password to connect to the database.
+            database: The name of the database to connect to.
+            
+        Returns:
+            connection: A MySQLConnection object representing the connection to the database.
+    """
     try:
         connection = mysql.connector.connect(
             host= host,
@@ -16,28 +29,23 @@ def create_connection(host, port, user, password, database):
             return connection
         
     except Error as e:
-        return None
+        return {"code":500, "msg": "Internal server error"}
 
 
-def execute_query(connection, query, params=None):
+def execute_query(connection, query:str, params:list=None):
+    """
+        Execute a SQL query on the database.
+
+        Args:
+            connection: A MySQLConnection object representing the connection to the database.
+            query: The SQL query to execute.
+            params: Optional parameters for the SQL query.
+
+        Returns:
+            results: The results of the query as a list of tuples.
+    """
+
     with connection:
         with connection.cursor() as cursor:
             cursor.execute(query, params)
             return cursor.fetchall()
-    return None
-
-
-if __name__ == "__main__":
-    with create_connection() as conn:
-        if conn:
-            print("Conexión establecida correctamente.")
-        else:
-            print("No se pudo establecer la conexión.")
-
-    # consulta = "SELECT * FROM tabla_ejemplo WHERE columna = %s"
-    # parametros = ("valor",)  # Tuple con parámetros para evitar inyecciones SQL
-    # resultados = ejecutar_consulta(consulta, parametros)
-
-    # if resultados:
-    #     for fila in resultados:
-    #         print(fila)
