@@ -97,6 +97,9 @@ También es posible no enviar ninguna información en el cuerpo de la petición.
 
 Para añadir soporte para implementar me gusta a los usuarios registrados se añade la tabla *like_history*, en la cual se guardan los campos que referencian los ids de las propiedades a las cuales los usuarios identificados con un id les dan like. De este modo es posible guardar el historial de likes de un usuario que se halla registrado sin degradar la normalización de la base de datos y utilizando la tabla *auth_user* que ya se encuentra creada. Además, el campo *update_date* ayuda a llevar una traza del comportamiento de un usuario con sus respectivos gustos por determinados inmuebles.
 
+![Tecnica HABI REQ2](https://github.com/user-attachments/assets/5bc3d167-ee14-4f35-b77b-89d9a0308e43)
+
+
 El código para la creación de la tabla *like_history* y las restricciones de llave foránea necesarias para extender el modelo se muestra a continuación:
 
 ```sql
