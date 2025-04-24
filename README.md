@@ -1,17 +1,19 @@
-# Prueba técnica Habi
+# Prueba Técnica Habi
 
 ## Tecnologías a utilizar
-El desarrollo se llevará a cabo utilizando python. Dadas las condiciones de implementación se evita el uso de frameworks como flask o fastapi, por lo que se utilizará librerías de python para el manejo de variables de entorno, conectores para la base de datos y soporte para el desarrollo de consultas http:
+El desarrollo se llevará a cabo utilizando python. Dadas las condiciones de implementación se evita el uso de frameworks como flask o fastapi, por lo que se utilizará librerías de python para el manejo de variables de entorno, conectores para la base de datos y soporte para el desarrollo de consultas http. En particular, se utilizan las librerías:
 - *dotenv*
 - *mysql-connector-python*
 - *http*
+- *pytest*
 - *venv*
 
-## Estructura de desarrollo
+## Desarrollo
 ### Estructura de Carpetas
-Se utilizará un entorno virtual administrado con la librería *venv* en una carpeta con el mismo nombre. En la carpeta *database* se encuentra el código necesario para la conexión con la base de datos y sus respectivas peticiones. Las clases destinadas a representar entidades se encuentran en el directorio *model* y funciones adicionales como de verificación estarán almacenadas en la carpeta utils.
+Se utilizará un entorno virtual administrado con la librería *venv* en carpeta con el mismo nombre. En la carpeta *database* se encuentra el código necesario para la conexión con la base de datos y la ejecución de consultas sql. El controlador que actúa como intermediario entre la api y la base de datos se encuentra en la carpeta *controller*. Dicho controlador cuenta con funciones para construir la consulta sql requerida para la obtención de los inmuebles con la aplición de filtros opcionales y realiza la validación de dichos filtros. Además ejecuta la consulta sql y retorna el resultado de la misma en formato JSON. Por último, se añdió una carpeta *test* con el propósito de alojar las pruebas unitarias del código.
 
-La aplicación se inicia desde el archivo *main.py* que se encuentra en la raiz del proyecto y requiere la utilización de un archivo *.env* con la información necesaria para la conexión con la base de datos. Es decir, se requieren las variables:
+La aplicación se ejecuta desde el archivo *main.py* que se encuentra en la raiz del proyecto y requiere la utilización de un archivo *.env* con la información necesaria para la conexión con la base de datos. Es decir, se requieren las variables:
+
 ```
 HOST: host_example
 PORT: port_example
@@ -25,8 +27,34 @@ De este modo, la estructura de carpetas propuesta para el cumplimiento de los re
 ```
 ├── api
 ├── database
-├── model
-├── utils
+├── controller
+├── test
 |── venv
 └── main.py
 ```
+
+### Aspectos a Tomar en Cuenta
+
+#### Filtros
+Dado que se menciona que se pueden aplicar multiples filtros se realizaron las siguiente suposiciones:
+
+- Cuando un usuario introduce 1 año particular como filtro, el sistema retorna solo los inmuebles que fueron construidos en ese año en particular que cumplan con el resto de filtros si es el caso.
+
+- Cuando se introducen 2 años, el sistema retorna los inmuebles que fueron construidos en el rango de fechas entre los dos años.
+
+- Si se introducen mas de 2 años, el sistema retorna los inmuebles construidos en esos años en particular.
+
+- Es posible filtrar por más de una ciudad
+
+- Es posible filtrar por más de un estado y no se permite estados diferentes a 3, 4 y 5; Pre_venta, en_venta y vendido respectivamente.
+
+- La información de los inmuebles que se muestra corresponde a los valores *status*, *city*, *address*, *year*, *price* y *description*.
+
+### Ejecución
+Para ejecutar la aplicación se hace necesario cumplir con los siguientes requerimientos:
+
+- Creación de un entorno virutal con *venv* y la instalación de las dependencias enumeradas en el archivo *requirements.txt*
+
+- Creación de un archivo *.env* en la raiz del proyecto con las variables que se mencionaron en el apartado *Estructura de Carpetas*
+
+- Ejecución del archivo *main.py*
