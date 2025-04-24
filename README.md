@@ -92,3 +92,9 @@ Se espera que el frontend envíe en formato .json los campos por los cuales se v
 ```
 
 También es posible no enviar ninguna información en el cuerpo de la petición.
+
+## Requerimiento 2: *Me Gusta*
+
+![Tecnica HABI REQ2](https://github.com/user-attachments/assets/42f5e00a-848d-488a-8a56-85c0b9f35486)
+
+Para añadir soporte para implementar me gusta a los usuarios registrados se añade la tabla *like_history*, en la cual se guardan los campos que referencian los ids de las propiedades a las cuales los usuarios identificados con un id les dan like. De este modo es posible guardar el historial de likes de un usuario que se halla registrado sin degradar la normalización de la base de datos y utilizando la tabla *auth_user* que ya se encuentra creada. Además, el campo *update_date* ayuda a llevar una traza del comportamiento de un usuario con sus respectivos gustos por determinados inmuebles.
